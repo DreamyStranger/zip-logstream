@@ -1,0 +1,9 @@
+python -m venv .venv
+.venv\Scripts\activate
+python -m pip install --upgrade pip
+python -m pip install build twine
+rmdir /s /q dist
+rmdir /s /q build
+rmdir /s /q src\*.egg-info
+python -m build
+python -m twine check dist\*

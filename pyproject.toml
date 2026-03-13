@@ -1,0 +1,134 @@
+# ============================================================================
+# pyproject.toml
+# ============================================================================
+# Project configuration for the ziplogstream package.
+#
+# This file defines:
+# - build backend and packaging metadata
+# - project metadata for installation and distribution
+# - optional development dependencies
+# - setuptools configuration for the src/ layout
+# - tool configuration for pytest, coverage, Ruff, and MyPy
+# ============================================================================
+
+[build-system]
+# Setuptools-based build configuration.
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+# Core package metadata exposed to packaging tools and package indexes.
+name = "ziplogstream"
+description = "Bounded-memory streaming of text lines from files inside ZIP archives."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+
+authors = [
+  { name = "Timur Anvar" }
+]
+
+dynamic = ["version"]
+
+keywords = [
+  "zip",
+  "streaming",
+  "logs",
+  "parser",
+  "memory-efficient",
+]
+
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: Libraries",
+  "Topic :: System :: Archiving :: Compression",
+  "Topic :: Text Processing",
+]
+
+# Runtime dependencies.
+# Keep this empty unless the package truly requires third-party libraries.
+dependencies = []
+
+[project.optional-dependencies]
+# Development-only dependencies used for local testing, linting, and type checking.
+dev = [
+  "pytest>=8.0",
+  "pytest-cov>=5.0",
+  "ruff>=0.6.0",
+  "mypy>=1.10.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/DreamyStranger/ziplogstream"
+Repository = "https://github.com/DreamyStranger/ziplogstream"
+Issues = "https://github.com/DreamyStranger/ziplogstream/issues"
+
+[tool.setuptools]
+# The project uses a src/ layout.
+package-dir = { "" = "src" }
+include-package-data = true
+
+[tool.setuptools.packages.find]
+# Find packages under src/.
+where = ["src"]
+include = ["ziplogstream*"]
+
+[tool.setuptools.package-data]
+# PEP 561 marker so downstream users can consume inline type information.
+ziplogstream = ["py.typed"]
+
+[tool.pytest.ini_options]
+# Pytest configuration kept in pyproject.toml for centralized tooling config.
+minversion = "8.0"
+testpaths = ["tests"]
+
+# Adding src/ to the Python path makes local test execution convenient.
+# Imports should still use `import ziplogstream`, not `import src.ziplogstream`.
+pythonpath = ["src"]
+
+# -ra: show extra summary info for skipped, failed, and xfailed tests.
+addopts = [
+  "-ra",
+]
+
+[tool.coverage.run]
+# Measure branch coverage and restrict coverage collection to the package itself.
+source = ["ziplogstream"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+skip_empty = true
+
+[tool.ruff]
+# A 100-character line length is a practical modern default for Python libraries.
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+# E: pycodestyle errors
+# F: pyflakes
+# I: import sorting
+# B: flake8-bugbear
+select = ["E", "F", "I", "B"]
+
+[tool.mypy]
+# MyPy configuration for static type checking.
+python_version = "3.11"
+strict = false
+ignore_missing_imports = true
+# Improves output quality when checking typed package code.
+pretty = true
+show_error_codes = true
+
+[tool.setuptools.dynamic]
+# pulls version number from a python file
+version = {attr = "ziplogstream.version.__version__"}
