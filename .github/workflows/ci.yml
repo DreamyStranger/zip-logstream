@@ -6,11 +6,13 @@ on:
 
 jobs:
   test:
+    name: Test (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ["3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12"]
 
     steps:
       - name: Checkout repository
@@ -26,14 +28,66 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e .[dev]
 
-      - name: Run Ruff (lint)
-        run: |
-          ruff check .
+      - name: Lint (Ruff)
+        run: ruff check .
 
-      - name: Run MyPy (type check)
-        run: |
-          mypy src
+      - name: Type check (MyPy)
+        run: mypy src
 
       - name: Run tests
+        run: pytest --cov=ziplogstream --cov-report=term-missing
+
+  package:
+    name: Package validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install packaging tools
         run: |
-          pytest --cov=ziplogstream --cov-report=term-missing
+          python -m pip install --upgrade pip
+          pip install build twine
+
+      - name: Build distributions
+        run: python -m build
+
+      - name: Check distributions
+        run: twine check dist/*
+
+      - name: Smoke test (wheel)
+        run: |
+          python -m venv .venv-wheel
+          . .venv-wheel/bin/activate
+          python -m pip install --upgrade pip
+          pip install --no-cache-dir dist/*.whl
+          python - <<'PY'
+          import ziplogstream
+          print("version:", ziplogstream.__version__)
+
+          exported = getattr(ziplogstream, "__all__", None)
+          print("__all__:", exported)
+
+          from ziplogstream import LineStreamer
+          print("LineStreamer import ok")
+          PY
+
+      - name: Smoke test (sdist)
+        run: |
+          python -m venv .venv-sdist
+          . .venv-sdist/bin/activate
+          python -m pip install --upgrade pip
+          pip install --no-cache-dir dist/*.tar.gz
+          python - <<'PY'
+          import ziplogstream
+          print("version:", ziplogstream.__version__)
+
+          from ziplogstream import LineStreamer
+          print("LineStreamer import ok")
+          PY
