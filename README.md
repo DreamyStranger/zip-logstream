@@ -4,7 +4,6 @@
 [![Release](https://github.com/DreamyStranger/zip-logstream/actions/workflows/release.yml/badge.svg)](https://github.com/DreamyStranger/zip-logstream/actions/workflows/release.yml)
 [![Python Versions](https://img.shields.io/pypi/pyversions/zip-logstream.svg)](https://pypi.org/project/zip-logstream/)
 [![License](https://img.shields.io/github/license/DreamyStranger/zip-logstream.svg)](LICENSE)
-[![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](https://github.com/DreamyStranger/zip-logstream/actions/workflows/ci.yml)
 
 **Streaming line reader for large log files stored inside ZIP archives.**
 
